@@ -12,7 +12,7 @@ def get_jobs():
     try:
         # Setup headless Chrome for Render
         chrome_options = Options()
-       chrome_options.binary_location = "/opt/google/chrome/google-chrome"
+        chrome_options.binary_location = "/opt/google/chrome/google-chrome"
         chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
