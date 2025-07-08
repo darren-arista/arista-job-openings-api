@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
-@app.route("/jobs", methods=["GET"])
+@app.route("/", methods=["GET"])
 def get_jobs():
     # Setup headless Chrome
     chrome_options = Options()
@@ -79,7 +79,8 @@ def get_jobs():
             "skills_required": skills
         })
 
-    return jsonify({"jobs": job_list})
+    return jsonify({"jobs": job_list}) 
+
 
 if __name__ == "__main__":
     app.run(debug=True)
