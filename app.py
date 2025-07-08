@@ -9,22 +9,13 @@ app = Flask(__name__)
 
 @app.route("/jobs", methods=["GET"])
 def get_jobs():
-
     # Setup headless Chrome
     chrome_options = Options()
     
     chrome_options.add_argument("--headless")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.binary_location = "/usr/bin/chromium"
-
-    try:
-        # Setup headless Chrome for Render
-        chrome_options = Options()
-        chrome_options.binary_location = "/opt/google/chrome/google-chrome"
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.binary_location = "/usr/bin/google-chrome"
 
 
     driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
