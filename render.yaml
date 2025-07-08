@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: arista-job-api
+    env: python
+    buildCommand: |
+      apt-get update && \
+      apt-get install -y chromium-browser && \
+      pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    plan: free
