@@ -1,5 +1,5 @@
 flask
+gunicorn
 selenium
 webdriver-manager
 beautifulsoup4
-gunicorn
