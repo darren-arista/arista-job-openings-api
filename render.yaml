@@ -1,7 +1,6 @@
 services:
   - type: web
     name: arista-job-api
-    env: python
-    buildCommand: ""
-    startCommand: ./start.sh
+    env: docker
     plan: free
+    dockerfilePath: ./Dockerfile
