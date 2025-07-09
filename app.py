@@ -12,7 +12,7 @@ app = Flask(__name__)
 # Global cache
 cached_jobs = []
 last_fetched = 0
-CACHE_DURATION = 600  # 10 minutes in seconds
+CACHE_DURATION = 30
 
 def fetch_job_data():
     global cached_jobs, last_fetched
