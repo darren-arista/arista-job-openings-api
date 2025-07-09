@@ -45,4 +45,5 @@ WORKDIR /app
 EXPOSE 10000
 
 # Start the application using Gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:10000", "app:app"]
+CMD ["python", "app.py"]

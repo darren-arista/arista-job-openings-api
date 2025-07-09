@@ -16,13 +16,14 @@ CACHE_INTERVAL = 30  # seconds
 def fetch_job_data():
     global cached_jobs
     print("🔄 Fetching job data...")
-    try:
-        options = Options()
-        options.add_argument("--headless")
-        options.add_argument("--no-sandbox")
-        options.add_argument("--disable-dev-shm-usage")
 
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    try:
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
         driver.get("https://aristasystems.in/careers.php")
         soup = BeautifulSoup(driver.page_source, "html.parser")
         driver.quit()
@@ -83,21 +84,25 @@ def fetch_job_data():
     except Exception as e:
         print(f"❌ Error while fetching job data: {e}")
 
-# Background thread
-def schedule_data_refresh():
-    def loop():
+# Background updater
+def start_cache_updater():
+    def update_loop():
         while True:
             fetch_job_data()
             time.sleep(CACHE_INTERVAL)
-    thread = threading.Thread(target=loop)
-    thread.daemon = True
-    thread.start()
+
+    updater_thread = threading.Thread(target=update_loop, daemon=True)
+    updater_thread.start()
 
 @app.route("/jobs", methods=["GET"])
 def get_jobs():
     return jsonify({"jobs": cached_jobs})
 
-if __name__ == "__main__":
+def run_app():
+    print("🚀 Starting app & pre-fetching data")
     fetch_job_data()
-    schedule_data_refresh()
-    app.run(debug=False, host="0.0.0.0", port=5000)
+    start_cache_updater()
+    app.run(host="0.0.0.0", port=10000)
+
+if __name__ == "__main__":
+    run_app()
