@@ -95,7 +95,7 @@ def start_cache_updater():
     updater_thread = threading.Thread(target=update_loop, daemon=True)
     updater_thread.start()
 
-@app.route("/jobs", methods=["GET"])
+@app.route("/jobs/arista-jobs/available-roles", methods=["GET"])
 def get_jobs():
     return jsonify({"jobs": cached_jobs})
 
