@@ -11,21 +11,18 @@ app = Flask(__name__)
 
 # Global cache
 cached_jobs = []
-last_fetched = 0
-CACHE_DURATION = 60  # 10 minutes in seconds
+CACHE_INTERVAL = 30  # seconds
 
 def fetch_job_data():
-    global cached_jobs, last_fetched
-    print("🔄 Refreshing job data cache...")
-
+    global cached_jobs
+    print("🔄 Fetching job data...")
     try:
-        chrome_options = Options()
-        chrome_options.binary_location = "/usr/bin/google-chrome"
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
+        options = Options()
+        options.add_argument("--headless")
+        options.add_argument("--no-sandbox")
+        options.add_argument("--disable-dev-shm-usage")
 
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         driver.get("https://aristasystems.in/careers.php")
         soup = BeautifulSoup(driver.page_source, "html.parser")
         driver.quit()
@@ -81,28 +78,26 @@ def fetch_job_data():
             })
 
         cached_jobs = job_list
-        last_fetched = time.time()
-        print(f"✅ Cache updated with {len(job_list)} jobs.")
-    except Exception as e:
-        print(f"❌ Error updating job data: {e}")
+        print(f"✅ Job cache updated with {len(cached_jobs)} entries.")
 
-def start_background_updater():
-    def updater():
+    except Exception as e:
+        print(f"❌ Error while fetching job data: {e}")
+
+# Background thread
+def schedule_data_refresh():
+    def loop():
         while True:
             fetch_job_data()
-            time.sleep(CACHE_DURATION)
-    thread = threading.Thread(target=updater)
+            time.sleep(CACHE_INTERVAL)
+    thread = threading.Thread(target=loop)
     thread.daemon = True
     thread.start()
-
-# ✅ Call these on module import so they run in Gunicorn
-fetch_job_data()
-start_background_updater()
 
 @app.route("/jobs", methods=["GET"])
 def get_jobs():
     return jsonify({"jobs": cached_jobs})
 
-@app.route("/healthz")
-def health():
-    return "OK", 200
+if __name__ == "__main__":
+    fetch_job_data()
+    schedule_data_refresh()
+    app.run(debug=False, host="0.0.0.0", port=5000)
