@@ -4,3 +4,8 @@ services:
     env: docker
     plan: free
     dockerfilePath: ./Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 10000
+    healthCheckPath: /jobs
