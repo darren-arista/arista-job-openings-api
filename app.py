@@ -12,11 +12,11 @@ app = Flask(__name__)
 # Global cache
 cached_jobs = []
 last_fetched = 0
-CACHE_DURATION = 30
+CACHE_DURATION = 60  # 10 minutes in seconds
 
 def fetch_job_data():
     global cached_jobs, last_fetched
-    print("Refreshing job data cache...")
+    print("🔄 Refreshing job data cache...")
 
     try:
         chrome_options = Options()
@@ -86,7 +86,6 @@ def fetch_job_data():
     except Exception as e:
         print(f"❌ Error updating job data: {e}")
 
-# Background thread for periodic refresh
 def start_background_updater():
     def updater():
         while True:
@@ -96,12 +95,14 @@ def start_background_updater():
     thread.daemon = True
     thread.start()
 
+# ✅ Call these on module import so they run in Gunicorn
+fetch_job_data()
+start_background_updater()
+
 @app.route("/jobs", methods=["GET"])
 def get_jobs():
     return jsonify({"jobs": cached_jobs})
 
-if __name__ == "__main__":
-    print("🚀 Starting server...")
-    fetch_job_data()  # Initial load
-    start_background_updater()
-    app.run(debug=False, host="0.0.0.0", port=5000)
+@app.route("/healthz")
+def health():
+    return "OK", 200
